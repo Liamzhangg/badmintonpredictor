@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+.DS_Store
+*.pyc
+*.pyo
+*.pyd
+*.sqlite
+data/raw/
+data/interim/
+models/
+notebooks/.ipynb_checkpoints/

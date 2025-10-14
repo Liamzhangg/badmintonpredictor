@@ -1,0 +1,78 @@
+project:
+  random_seed: 42
+  cache_head_to_head: true
+
+data:
+  matches:
+    - path: data/raw/matches_2023.csv
+      format: csv
+      date_column: match_date
+      player_a_column: player_a
+      player_b_column: player_b
+      winner_column: winner
+      score_column: score
+      event_columns:
+        - tournament
+        - round
+        - court_conditions
+    - path: data/raw/matches_2024.csv
+      format: csv
+      date_column: match_date
+      player_a_column: player_a
+      player_b_column: player_b
+      winner_column: winner
+  player_attributes:
+    path: data/raw/player_attributes.csv
+    format: csv
+    id_column: player_name
+    columns:
+      - birth_date
+      - height_cm
+      - weight_kg
+      - dominant_hand
+      - country
+
+features:
+  rolling_windows_days:
+    - 30
+    - 90
+    - 180
+  elo:
+    k_factor: 32
+    floor_rating: 1200
+    decay: 0.995
+  head_to_head:
+    minimum_matches: 2
+  include_columns:
+    - player_a_age
+    - player_b_age
+    - player_a_height_cm
+    - player_b_height_cm
+    - player_a_recent_win_rate_30d
+    - player_b_recent_win_rate_30d
+    - player_a_elo
+    - player_b_elo
+    - head_to_head_win_pct_a
+    - head_to_head_win_pct_b
+
+model:
+  type: logistic_regression
+  params:
+    penalty: l2
+    C: 1.0
+    solver: lbfgs
+    max_iter: 500
+
+training:
+  target_column: player_a_wins
+  class_weight: balanced
+  validation_strategy:
+    type: time_split
+    n_splits: 5
+    test_size: 120
+
+output:
+  processed_matches: data/interim/processed_matches.parquet
+  features_matrix: data/interim/features.parquet
+  model_artifact: models/badminton_gb_model.pkl
+  metrics_report: models/metrics.json
