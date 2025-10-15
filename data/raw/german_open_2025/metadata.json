@@ -1,0 +1,285 @@
+{
+  "tournament_id": "A30506E5-D713-4914-8FF8-FD7021B5CBE7",
+  "tournament_family": "34",
+  "start_date": "2025-02-25",
+  "end_date": "2025-03-02",
+  "page_title": "German Open 2025 - Badminton Statistics",
+  "tournament_name": "German Open",
+  "season_year": "2025",
+  "available_years": [
+    "2025",
+    "2024",
+    "2023",
+    "2022",
+    "2019",
+    "2018",
+    "2017",
+    "2016",
+    "2015",
+    "2014",
+    "2013",
+    "2012",
+    "2011",
+    "2010",
+    "2009",
+    "2008",
+    "2007",
+    "2006",
+    "2005",
+    "2004",
+    "2003",
+    "2002",
+    "2001",
+    "2000",
+    "1999",
+    "1997",
+    "1996",
+    "1995",
+    "1994",
+    "1993",
+    "1992",
+    "1991",
+    "1990",
+    "1989"
+  ],
+  "available_year_ids": {
+    "2025": "A30506E5-D713-4914-8FF8-FD7021B5CBE7",
+    "2024": "9016DBCA-BE8A-495D-A04A-4E15AA38B579",
+    "2023": "24639F0A-A1CA-4711-A78B-DFC8AB19FD1A",
+    "2022": "3EE97BA3-95BB-460D-B464-FF31CF46EF9D",
+    "2019": "444F7F0E-65BC-4F1E-A602-08ED7B5962A4",
+    "2018": "42A5647B-467F-47A1-88EB-53B7580C6EBA",
+    "2017": "620C95A0-5886-44BA-A773-260A5EC078D6",
+    "2016": "71618939-AC78-4ECB-B7A9-B1300A806E30",
+    "2015": "19A76ABB-4E06-4B9A-B398-555205B7748B",
+    "2014": "F2C62064-9573-4195-B7EB-265662B7326D",
+    "2013": "B9EB1E1E-2351-440D-8F7D-8D983386A706",
+    "2012": "596D798E-F45C-45AA-9A03-305480068147",
+    "2011": "736DBDE6-1AB2-4389-9E76-775C9C06DCA5",
+    "2010": "F72559BF-123D-4EBF-98FC-DCAC4D6C1CFD",
+    "2009": "2A18482F-22C0-4576-8486-374AF9425901",
+    "2008": "FE4766D4-A2DF-446E-B4FD-3E377E33FC5C",
+    "2007": "FC25AF73-B940-4A0A-A80C-327253D4C1FB",
+    "2006": "1E280972-8FE6-4384-A944-926AAE6666EE",
+    "2005": "A5CCEAA5-E90F-49C2-B192-0DC7E26172B6",
+    "2004": "198A3EDE-7BF0-4907-AE86-B94496382D2F",
+    "2003": "0AF9AC7F-4441-4BF9-B439-835D84A3B58C",
+    "2002": "D9694EB0-3837-4E1B-A3B0-062DD5C6733B",
+    "2001": "71006A06-B8C0-494D-A68E-5D27FB502F83",
+    "2000": "68661055-0476-4DFF-9519-A70C51427A45",
+    "1999": "61C56D98-0E07-45CE-AAA5-8F52B2A8A302",
+    "1997": "869EB58E-5FB9-4571-A6E6-B161F27CD89A",
+    "1996": "D25FE532-0A37-4159-AB34-82969084C6FC",
+    "1995": "E714C404-576C-490C-9B7C-988DEF4CE445",
+    "1994": "0494B19D-F087-483E-8F84-E6FF1685B39C",
+    "1993": "C64F7BFB-1911-4AEB-9B9C-B79584521128",
+    "1992": "2D3FCC23-7309-426F-A682-B633A9055B67",
+    "1991": "4FF9402C-A9FA-4718-8248-3BDC1BD66B2F",
+    "1990": "345BF021-09BC-4C3A-B6B9-4B44C5E7CE37",
+    "1989": "208502F7-CD13-4E77-BDC4-F574D2047757"
+  },
+  "year_options": [
+    {
+      "label": "2025",
+      "tournament_id": "A30506E5-D713-4914-8FF8-FD7021B5CBE7",
+      "selected": true
+    },
+    {
+      "label": "2024",
+      "tournament_id": "9016DBCA-BE8A-495D-A04A-4E15AA38B579",
+      "selected": false
+    },
+    {
+      "label": "2023",
+      "tournament_id": "24639F0A-A1CA-4711-A78B-DFC8AB19FD1A",
+      "selected": false
+    },
+    {
+      "label": "2022",
+      "tournament_id": "3EE97BA3-95BB-460D-B464-FF31CF46EF9D",
+      "selected": false
+    },
+    {
+      "label": "2019",
+      "tournament_id": "444F7F0E-65BC-4F1E-A602-08ED7B5962A4",
+      "selected": false
+    },
+    {
+      "label": "2018",
+      "tournament_id": "42A5647B-467F-47A1-88EB-53B7580C6EBA",
+      "selected": false
+    },
+    {
+      "label": "2017",
+      "tournament_id": "620C95A0-5886-44BA-A773-260A5EC078D6",
+      "selected": false
+    },
+    {
+      "label": "2016",
+      "tournament_id": "71618939-AC78-4ECB-B7A9-B1300A806E30",
+      "selected": false
+    },
+    {
+      "label": "2015",
+      "tournament_id": "19A76ABB-4E06-4B9A-B398-555205B7748B",
+      "selected": false
+    },
+    {
+      "label": "2014",
+      "tournament_id": "F2C62064-9573-4195-B7EB-265662B7326D",
+      "selected": false
+    },
+    {
+      "label": "2013",
+      "tournament_id": "B9EB1E1E-2351-440D-8F7D-8D983386A706",
+      "selected": false
+    },
+    {
+      "label": "2012",
+      "tournament_id": "596D798E-F45C-45AA-9A03-305480068147",
+      "selected": false
+    },
+    {
+      "label": "2011",
+      "tournament_id": "736DBDE6-1AB2-4389-9E76-775C9C06DCA5",
+      "selected": false
+    },
+    {
+      "label": "2010",
+      "tournament_id": "F72559BF-123D-4EBF-98FC-DCAC4D6C1CFD",
+      "selected": false
+    },
+    {
+      "label": "2009",
+      "tournament_id": "2A18482F-22C0-4576-8486-374AF9425901",
+      "selected": false
+    },
+    {
+      "label": "2008",
+      "tournament_id": "FE4766D4-A2DF-446E-B4FD-3E377E33FC5C",
+      "selected": false
+    },
+    {
+      "label": "2007",
+      "tournament_id": "FC25AF73-B940-4A0A-A80C-327253D4C1FB",
+      "selected": false
+    },
+    {
+      "label": "2006",
+      "tournament_id": "1E280972-8FE6-4384-A944-926AAE6666EE",
+      "selected": false
+    },
+    {
+      "label": "2005",
+      "tournament_id": "A5CCEAA5-E90F-49C2-B192-0DC7E26172B6",
+      "selected": false
+    },
+    {
+      "label": "2004",
+      "tournament_id": "198A3EDE-7BF0-4907-AE86-B94496382D2F",
+      "selected": false
+    },
+    {
+      "label": "2003",
+      "tournament_id": "0AF9AC7F-4441-4BF9-B439-835D84A3B58C",
+      "selected": false
+    },
+    {
+      "label": "2002",
+      "tournament_id": "D9694EB0-3837-4E1B-A3B0-062DD5C6733B",
+      "selected": false
+    },
+    {
+      "label": "2001",
+      "tournament_id": "71006A06-B8C0-494D-A68E-5D27FB502F83",
+      "selected": false
+    },
+    {
+      "label": "2000",
+      "tournament_id": "68661055-0476-4DFF-9519-A70C51427A45",
+      "selected": false
+    },
+    {
+      "label": "1999",
+      "tournament_id": "61C56D98-0E07-45CE-AAA5-8F52B2A8A302",
+      "selected": false
+    },
+    {
+      "label": "1997",
+      "tournament_id": "869EB58E-5FB9-4571-A6E6-B161F27CD89A",
+      "selected": false
+    },
+    {
+      "label": "1996",
+      "tournament_id": "D25FE532-0A37-4159-AB34-82969084C6FC",
+      "selected": false
+    },
+    {
+      "label": "1995",
+      "tournament_id": "E714C404-576C-490C-9B7C-988DEF4CE445",
+      "selected": false
+    },
+    {
+      "label": "1994",
+      "tournament_id": "0494B19D-F087-483E-8F84-E6FF1685B39C",
+      "selected": false
+    },
+    {
+      "label": "1993",
+      "tournament_id": "C64F7BFB-1911-4AEB-9B9C-B79584521128",
+      "selected": false
+    },
+    {
+      "label": "1992",
+      "tournament_id": "2D3FCC23-7309-426F-A682-B633A9055B67",
+      "selected": false
+    },
+    {
+      "label": "1991",
+      "tournament_id": "4FF9402C-A9FA-4718-8248-3BDC1BD66B2F",
+      "selected": false
+    },
+    {
+      "label": "1990",
+      "tournament_id": "345BF021-09BC-4C3A-B6B9-4B44C5E7CE37",
+      "selected": false
+    },
+    {
+      "label": "1989",
+      "tournament_id": "208502F7-CD13-4E77-BDC4-F574D2047757",
+      "selected": false
+    }
+  ],
+  "stat_categories": [
+    "%",
+    "MS",
+    "WS",
+    "MD",
+    "WD",
+    "XD"
+  ],
+  "round_filters": [
+    "%",
+    "Round1",
+    "Round2",
+    "Quarter",
+    "Semi",
+    "Final"
+  ],
+  "draw_categories": [
+    "MD",
+    "MD (Q)",
+    "MS",
+    "MS (Q)",
+    "WD",
+    "WD (Q)",
+    "WS",
+    "WS (Q)",
+    "XD",
+    "XD (Q)"
+  ],
+  "tournament_dates": "25/02/2025-02/03/2025",
+  "location": "Germany, Mülheim an der Ruhr",
+  "tournament_category": "HSBC BWF World Tour Super 300",
+  "source_id": "A30506E5-D713-4914-8FF8-FD7021B5CBE7"
+}

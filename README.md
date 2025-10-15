@@ -44,7 +44,7 @@ You can pull structured match statistics, historical winners, and draw brackets 
        --tournament-id YONEXGermanOpe20257cf \
        --output-dir data/raw/german_open_2025
    ```
-   This writes `metadata.json`, `history.csv`, a `statistics/` folder, and optional `draws/` CSVs under the output directory.
+   This writes `metadata.json`, `history.csv`, `matches.csv` (one row per match with players/scores), a `statistics/` folder, and optional `draws/` CSVs under the output directory.
 3. Use `--preview` to inspect the payload without writing files, or `--skip-draws` if you only need the statistics tables.
 
 To automate every season listed in the tournament dropdown, let the CLI crawl the embedded links:
@@ -57,6 +57,20 @@ PYTHONPATH=src python3 -m badminton_predictor.scrape \
 ```
 
 You can limit the scrape to specific seasons with `--years 2025 2024`, and the tool will create one folder per season (e.g., `data/raw/german_open_2025/`).
+
+To persist everything in a structured SQLite database (keyed by tournament → year → category), add:
+
+```bash
+PYTHONPATH=src python3 -m badminton_predictor.scrape \
+    --tournament-url "https://www.badmintonstatistics.net/Tournament?tournamentid=YONEXGermanOpe20257cf" \
+    --years 2025 2024 \
+    --database data/bwf_matches.sqlite
+```
+
+Each run prints the tournament name and match count as it scrapes, then upserts the data into:
+
+- `tournaments` (tournament GUID, year, location, category metadata)
+- `matches` (round, players, scores, duration, and normalized category labels: Men's Singles, Women's Singles, etc.)
 
 The scraper normalizes HTML tables into pandas-ready CSVs so you can plug them into the existing ingestion pipeline (e.g., add the new files to `config/config.yml` under `data.matches` or load them in notebooks for exploratory analysis).
 

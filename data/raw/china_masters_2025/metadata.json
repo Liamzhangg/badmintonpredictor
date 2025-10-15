@@ -1,0 +1,118 @@
+{
+  "tournament_id": "14A93201-5C13-4A79-8969-4617EA634962",
+  "tournament_family": "10",
+  "start_date": "2025-03-11",
+  "end_date": "2025-03-16",
+  "page_title": "China Masters 2025 - Badminton Statistics",
+  "tournament_name": "China Masters",
+  "season_year": "2025",
+  "available_years": [
+    "2025",
+    "2024",
+    "2023",
+    "2019",
+    "2018",
+    "2017",
+    "2016",
+    "2015",
+    "2014",
+    "2001"
+  ],
+  "available_year_ids": {
+    "2025": "14A93201-5C13-4A79-8969-4617EA634962",
+    "2024": "55C321EE-D20F-485F-8378-34D80640CBEA",
+    "2023": "8B1531C0-63EC-4C45-A3EF-AA8D2CDF7115",
+    "2019": "AF6465A7-574C-483F-A82C-9D626EA06BF5",
+    "2018": "6614E5F7-6C30-4791-BC52-F3FF17BECA38",
+    "2017": "A38937B0-5589-494B-915B-7A400530BF07",
+    "2016": "65276591-A0C4-43C5-838B-211CB925B88E",
+    "2015": "38C05303-0D21-47BB-BCB8-6F499E6E23B2",
+    "2014": "8E7AC972-CE38-4271-A092-AFCD895769B4",
+    "2001": "08E84680-E2C3-4AEC-BD85-37381418A9A1"
+  },
+  "year_options": [
+    {
+      "label": "2025",
+      "tournament_id": "14A93201-5C13-4A79-8969-4617EA634962",
+      "selected": true
+    },
+    {
+      "label": "2024",
+      "tournament_id": "55C321EE-D20F-485F-8378-34D80640CBEA",
+      "selected": false
+    },
+    {
+      "label": "2023",
+      "tournament_id": "8B1531C0-63EC-4C45-A3EF-AA8D2CDF7115",
+      "selected": false
+    },
+    {
+      "label": "2019",
+      "tournament_id": "AF6465A7-574C-483F-A82C-9D626EA06BF5",
+      "selected": false
+    },
+    {
+      "label": "2018",
+      "tournament_id": "6614E5F7-6C30-4791-BC52-F3FF17BECA38",
+      "selected": false
+    },
+    {
+      "label": "2017",
+      "tournament_id": "A38937B0-5589-494B-915B-7A400530BF07",
+      "selected": false
+    },
+    {
+      "label": "2016",
+      "tournament_id": "65276591-A0C4-43C5-838B-211CB925B88E",
+      "selected": false
+    },
+    {
+      "label": "2015",
+      "tournament_id": "38C05303-0D21-47BB-BCB8-6F499E6E23B2",
+      "selected": false
+    },
+    {
+      "label": "2014",
+      "tournament_id": "8E7AC972-CE38-4271-A092-AFCD895769B4",
+      "selected": false
+    },
+    {
+      "label": "2001",
+      "tournament_id": "08E84680-E2C3-4AEC-BD85-37381418A9A1",
+      "selected": false
+    }
+  ],
+  "stat_categories": [
+    "%",
+    "MS",
+    "WS",
+    "MD",
+    "WD",
+    "XD"
+  ],
+  "round_filters": [
+    "%",
+    "Round1",
+    "Round2",
+    "Quarter",
+    "Semi",
+    "Final",
+    "Round3"
+  ],
+  "draw_categories": [
+    "MD",
+    "MD (Q)",
+    "MS",
+    "MS (Q)",
+    "WD",
+    "WD (Q)",
+    "WS",
+    "WS (Q)",
+    "XD",
+    "XD (Q)"
+  ],
+  "tournament_dates": "11/03/2025-16/03/2025",
+  "location": "China, Ruichang",
+  "tournament_category": "BWF Tour Super 100",
+  "source_id": "14A93201-5C13-4A79-8969-4617EA634962"
+}

@@ -10,7 +10,9 @@ from urllib.parse import parse_qsl, parse_qs, urljoin, urlparse
 
 import pandas as pd
 import requests
-from bs4 import BeautifulSoup, Tag
+from bs4 import BeautifulSoup, NavigableString, Tag
+
+from . import db
 
 _DEFAULT_BASE_URL = "https://www.badmintonstatistics.net/"
 _DEFAULT_HEADERS = {
@@ -22,7 +24,7 @@ _DEFAULT_HEADERS = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     "Accept-Language": "en-US,en;q=0.9",
 }
-_DEFAULT_TIMEOUT = 20
+_DEFAULT_TIMEOUT = 60
 
 
 @dataclass
@@ -31,6 +33,7 @@ class TournamentData:
 
     metadata: Dict[str, object]
     statistics: Dict[str, pd.DataFrame]
+    matches: pd.DataFrame
     history: pd.DataFrame
     draws: Dict[str, pd.DataFrame]
 
@@ -65,6 +68,7 @@ class BadmintonStatisticsClient:
         canonical_id = metadata.get("tournament_id") or tournament_id
 
         statistics = self._parse_statistics(soup)
+        matches = self._parse_matches(soup)
         history = self._parse_history(soup)
 
         draws: Dict[str, pd.DataFrame] = {}
@@ -75,7 +79,13 @@ class BadmintonStatisticsClient:
                 except Exception as exc:  # pragma: no cover - network edge cases
                     raise RuntimeError(f"Failed to fetch draw '{label}': {exc}") from exc
 
-        return TournamentData(metadata=metadata, statistics=statistics, history=history, draws=draws)
+        return TournamentData(
+            metadata=metadata,
+            statistics=statistics,
+            matches=matches,
+            history=history,
+            draws=draws,
+        )
 
     # -- Internal helpers ------------------------------------------------------
 
@@ -146,6 +156,24 @@ class BadmintonStatisticsClient:
             draw_options[label] = raw_value
 
         metadata["draw_categories"] = list(draw_options.keys())
+
+        info_section = soup.select_one("section.tournamentinfo")
+        if info_section:
+            details: Dict[str, str] = {}
+            current_key = None
+            for node in info_section.children:
+                if isinstance(node, Tag) and node.name == "b":
+                    current_key = node.get_text(strip=True).rstrip(":")
+                elif isinstance(node, NavigableString):
+                    text = node.strip()
+                    if current_key and text:
+                        details[current_key] = text
+                        current_key = None
+            if details:
+                metadata["tournament_dates"] = details.get("Tournament Dates")
+                metadata["location"] = details.get("Location")
+                metadata["tournament_category"] = details.get("Category")
+
         return metadata, draw_options
 
     def _parse_statistics(self, soup: BeautifulSoup) -> Dict[str, pd.DataFrame]:
@@ -161,6 +189,74 @@ class BadmintonStatisticsClient:
                 continue
             statistics[title] = _html_table_to_dataframe(table)
         return statistics
+
+    def _parse_matches(self, soup: BeautifulSoup) -> pd.DataFrame:
+        article = soup.select_one("#tournamentReports")
+        if not article:
+            return pd.DataFrame()
+
+        target_table: Optional[Tag] = None
+        for table in article.find_all("table"):
+            headers = [_normalize_cell_text(th) for th in table.find_all("th")]
+            if headers and headers[0].lower().startswith("round"):
+                target_table = table
+                break
+
+        if target_table is None:
+            return pd.DataFrame()
+
+        matches: List[Dict[str, str]] = []
+        current_category: Optional[str] = None
+
+        for row in target_table.find_all("tr"):
+            cells = row.find_all("td")
+            classes = row.get("class", []) or []
+
+            if cells and (
+                "reportSubHeader" in classes
+                or (len(cells) == 1 and (cells[0].get("colspan") or cells[0].get_text(strip=True)))
+            ):
+                current_category = cells[0].get_text(" ", strip=True)
+                continue
+
+            if len(cells) < 6:
+                continue
+
+            row_values = [_normalize_cell_text(cell) for cell in cells]
+
+            if all(value == "" for value in row_values):
+                continue
+
+            # Ensure we have exactly 7 values by padding
+            if len(row_values) < 7:
+                row_values.extend([""] * (7 - len(row_values)))
+
+            matches.append(
+                {
+                    "category": current_category or "",
+                    "round": row_values[0],
+                    "player_a_rank": row_values[1],
+                    "player_a": row_values[2],
+                    "score": row_values[3],
+                    "player_b": row_values[4],
+                    "player_b_rank": row_values[5],
+                    "duration_minutes": row_values[6],
+                }
+            )
+
+        dataframe = pd.DataFrame(matches)
+        if dataframe.empty:
+            return dataframe
+
+        split_series = dataframe["category"].apply(_split_category_label)
+        dataframe["category_code"] = split_series.apply(lambda item: item[0])
+        dataframe["category_label"] = split_series.apply(lambda item: item[1])
+
+        dataframe["duration_minutes"] = dataframe["duration_minutes"].apply(_parse_duration_value)
+        dataframe["player_a_rank"] = dataframe["player_a_rank"].replace("-", "")
+        dataframe["player_b_rank"] = dataframe["player_b_rank"].replace("-", "")
+
+        return dataframe
 
     def _parse_history(self, soup: BeautifulSoup) -> pd.DataFrame:
         table = soup.select_one("#HistoricalWinners table")
@@ -246,6 +342,32 @@ def slugify(text: str) -> str:
     return slug.strip("_") or "section"
 
 
+_CATEGORY_LABELS = {
+    "MS": "Men's Singles",
+    "WS": "Women's Singles",
+    "MD": "Men's Doubles",
+    "WD": "Women's Doubles",
+    "XD": "Mixed Doubles",
+}
+
+
+def _split_category_label(category: str) -> Tuple[str, str]:
+    if not category:
+        return "", ""
+    token = category.split()[0]
+    token = token.split("(")[0].strip().upper()
+    return token, _CATEGORY_LABELS.get(token, category.strip())
+
+
+def _parse_duration_value(value: str) -> Optional[int]:
+    if not value or value.strip() in {"-", ""}:
+        return None
+    digits = re.findall(r"\d+", value)
+    if not digits:
+        return None
+    return int(digits[0])
+
+
 # -- CLI -----------------------------------------------------------------------
 
 
@@ -261,6 +383,9 @@ def write_outputs(
 
     history_path = output_dir / "history.csv"
     payload.history.to_csv(history_path, index=False)
+
+    matches_path = output_dir / "matches.csv"
+    payload.matches.to_csv(matches_path, index=False)
 
     stats_dir = output_dir / "statistics"
     stats_dir.mkdir(exist_ok=True)
@@ -304,92 +429,106 @@ def main(argv: Optional[Iterable[str]] = None) -> None:
         action="store_true",
         help="Print a short preview of the scraped data instead of writing files.",
     )
+    parser.add_argument(
+        "--database",
+        type=Path,
+        help="Optional SQLite database file where tournament matches will be stored.",
+    )
     args = parser.parse_args(list(argv) if argv is not None else None)
 
     if not args.tournament_id and not args.tournament_url:
         parser.error("Provide either --tournament-id or --tournament-url.")
 
     client = BadmintonStatisticsClient(base_url=args.base_url)
+    conn = db.get_connection(args.database) if args.database else None
 
-    def _resolve_tournament_id() -> str:
-        if args.tournament_id:
-            return args.tournament_id
-        parsed = urlparse(args.tournament_url)
-        query = parse_qs(parsed.query)
-        tournament_id = query.get("tournamentid")
-        if not tournament_id:
-            parser.error("Could not find 'tournamentid' parameter in the provided URL.")
-        return tournament_id[0]
+    try:
 
-    tournament_id = _resolve_tournament_id()
+        def _resolve_tournament_id() -> str:
+            if args.tournament_id:
+                return args.tournament_id
+            parsed = urlparse(args.tournament_url)
+            query = parse_qs(parsed.query)
+            tournament_id = query.get("tournamentid")
+            if not tournament_id:
+                parser.error("Could not find 'tournamentid' parameter in the provided URL.")
+            return tournament_id[0]
 
-    if args.output_dir and (args.all_years or args.years):
-        parser.error("--output-dir cannot be combined with --all-years/--years.")
+        tournament_id = _resolve_tournament_id()
 
-    multi_year = args.all_years or bool(args.years)
+        if args.output_dir and (args.all_years or args.years):
+            parser.error("--output-dir cannot be combined with --all-years/--years.")
 
-    def _handle_output(dataset: TournamentData, year_label: Optional[str] = None) -> None:
-        if args.preview:
-            print(json.dumps(dataset.metadata, indent=2, ensure_ascii=False))
-            if not dataset.history.empty:
-                print("\nHistory head:")
-                print(dataset.history.head())
-            if dataset.statistics:
-                print("\nStatistics sections:")
-                for title, frame in dataset.statistics.items():
-                    print(f"- {title}: {len(frame)} rows, columns={list(frame.columns)}")
-            if dataset.draws:
-                print("\nDraw sections:")
-                for label, frame in dataset.draws.items():
-                    print(f"- {label}: {len(frame)} rows")
-            print("-" * 60)
+        multi_year = args.all_years or bool(args.years)
+
+        def _handle_output(dataset: TournamentData, year_label: Optional[str] = None) -> None:
+            if args.preview:
+                print(json.dumps(dataset.metadata, indent=2, ensure_ascii=False))
+                print(f"\nMatches rows: {len(dataset.matches)}")
+                if not dataset.history.empty:
+                    print("\nHistory head:")
+                    print(dataset.history.head())
+                if dataset.statistics:
+                    print("\nStatistics sections:")
+                    for title, frame in dataset.statistics.items():
+                        print(f"- {title}: {len(frame)} rows, columns={list(frame.columns)}")
+                if dataset.draws:
+                    print("\nDraw sections:")
+                    for label, frame in dataset.draws.items():
+                        print(f"- {label}: {len(frame)} rows")
+                print("-" * 60)
+                return
+
+            folder_title = dataset.metadata.get("tournament_name") or dataset.metadata.get("page_title")
+            folder_slug = slugify(folder_title or dataset.metadata.get("season_year") or dataset.metadata.get("source_id"))
+            if year_label:
+                folder_slug = f"{folder_slug}_{year_label}"
+
+            output_dir = args.output_dir or args.output_root / folder_slug
+            tournament_label = folder_title or dataset.metadata.get("season_year") or dataset.metadata.get("source_id")
+            print(f"Scraping {tournament_label} ({year_label or dataset.metadata.get('season_year')}) - {len(dataset.matches)} matches")
+            write_outputs(dataset, output_dir)
+            print(f"Wrote scraped data to {output_dir}")
+            if conn:
+                stored = db.store_tournament(conn, dataset)
+                print(f"Stored {stored} matches in {args.database}")
+
+        if not multi_year:
+            tournament = client.scrape_tournament(tournament_id, include_draws=not args.skip_draws)
+            _handle_output(tournament, year_label=tournament.metadata.get("season_year"))
             return
 
-        folder_title = dataset.metadata.get("tournament_name") or dataset.metadata.get("page_title")
-        folder_slug = slugify(folder_title or dataset.metadata.get("season_year") or dataset.metadata.get("source_id"))
-        if year_label:
-            folder_slug = f"{folder_slug}_{year_label}"
+        first_dataset = client.scrape_tournament(tournament_id, include_draws=not args.skip_draws)
+        year_options = first_dataset.metadata.get("year_options", [])
+        if not year_options:
+            parser.error("No year dropdown information found; cannot scrape multiple seasons automatically.")
 
-        output_dir = args.output_dir or args.output_root / folder_slug
-        write_outputs(dataset, output_dir)
-        print(f"Wrote scraped data to {output_dir}")
+        available_order = [item["label"] for item in year_options]
+        year_id_map = {item["label"]: item["tournament_id"] for item in year_options}
 
-    if not multi_year:
-        tournament = client.scrape_tournament(tournament_id, include_draws=not args.skip_draws)
-        _handle_output(tournament, year_label=tournament.metadata.get("season_year"))
-        if args.preview:
-            return
-        if args.output_dir:
-            return
-        return
+        requested_years = available_order if args.all_years else args.years
+        if not requested_years:
+            parser.error("Specify --years or --all-years when automating multiple seasons.")
 
-    first_dataset = client.scrape_tournament(tournament_id, include_draws=not args.skip_draws)
-    year_options = first_dataset.metadata.get("year_options", [])
-    if not year_options:
-        parser.error("No year dropdown information found; cannot scrape multiple seasons automatically.")
+        missing_years = [year for year in requested_years if year not in year_id_map]
+        if missing_years:
+            parser.error(f"Years not available on the tournament page: {', '.join(missing_years)}")
 
-    available_order = [item["label"] for item in year_options]
-    year_id_map = {item["label"]: item["tournament_id"] for item in year_options}
+        results: List[Tuple[str, TournamentData]] = []
+        for year in requested_years:
+            year_identifier = year_id_map[year]
+            if year_identifier == first_dataset.metadata.get("tournament_id"):
+                dataset = first_dataset
+            else:
+                dataset = client.scrape_tournament(year_identifier, include_draws=not args.skip_draws)
+            results.append((year, dataset))
 
-    requested_years = available_order if args.all_years else args.years
-    if not requested_years:
-        parser.error("Specify --years or --all-years when automating multiple seasons.")
+        for year, dataset in results:
+            _handle_output(dataset, year_label=year)
 
-    missing_years = [year for year in requested_years if year not in year_id_map]
-    if missing_years:
-        parser.error(f"Years not available on the tournament page: {', '.join(missing_years)}")
-
-    results: List[Tuple[str, TournamentData]] = []
-    for year in requested_years:
-        year_identifier = year_id_map[year]
-        if year_identifier == first_dataset.metadata.get("tournament_id"):
-            dataset = first_dataset
-        else:
-            dataset = client.scrape_tournament(year_identifier, include_draws=not args.skip_draws)
-        results.append((year, dataset))
-
-    for year, dataset in results:
-        _handle_output(dataset, year_label=year)
+    finally:
+        if conn:
+            conn.close()
 
 
 if __name__ == "__main__":  # pragma: no cover
